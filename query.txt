@@ -1,0 +1,34 @@
+/*Synapse te permite hacer queries directamente sobre los archicos del datalake de ENTRETENIMIENTO o sobre tablas del workspace SB_ENT_UN */
+
+--Para consultar un archivo tengo que usar la función OPENROWSET
+
+SELECT
+     [query].fecha_operacion
+    ,[query].hora_operacion
+    ,[query].parnet_id
+    ,[query].player_id
+    ,[query].operation_type_id
+    ,[query].balance_type_id
+    ,[query].operation_amount 
+
+FROM OPENROWSET(BULK 'https://entproddatalakestorage.dfs.core.windows.net/datalake/Fact_movement_Arg1/**',
+                FORMAT = 'PARQUET') [query]
+
+WHERE [query].partner_id= 253 and [query].player_id= 68430 
+
+--Si el archivo esta particionado puedo leer solamente una particion usuando la funcion filepath para no hacer un full scan *
+
+select top 100 *
+
+FROM OPENROWSET(BULK 'https://boldtproddatalakestorage.dfs.core.windows.net/datalake/DWBPLAY_CABA/dw/Fact_Movement/Year=*/Month=*/**',
+                FORMAT = 'PARQUET') a
+
+WHERE a.filepath(1)= 2023 and a.filepath(2) =5
+
+--Para consultar una tabla tengo que especificar en que workspace esta
+
+select  partner_id
+        ,count(*) as cant_registros
+
+from  SB_ENT_UN.du.Dim_player
+GROUP by partner_id
