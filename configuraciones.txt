@@ -1,0 +1,20 @@
+--drop EXTERNAL FILE FORMAT [DELIMITEDTEXT]
+
+CREATE EXTERNAL FILE FORMAT [PARQUET] 
+WITH (FORMAT_TYPE = PARQUET)
+
+CREATE EXTERNAL FILE FORMAT [DELIMITEDTEXT] 
+WITH (FORMAT_TYPE = DELIMITEDTEXT)
+
+--drop EXTERNAL DATA SOURCE [desarrollo2]
+
+--Creo conexion con el datalake "desarrollo"
+CREATE EXTERNAL DATA SOURCE [desarrollo]
+WITH (LOCATION = 'https://storageaccdesarrollo.dfs.core.windows.net/filesystemdesarrollo/')
+
+--otra forma de hacerlo es 
+CREATE EXTERNAL DATA SOURCE [desarrollo2] 
+WITH (LOCATION = 'abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.windows.net')
+
+CREATE EXTERNAL DATA SOURCE [produccion] 
+WITH (LOCATION = 'https://storageaccproduccion.dfs.core.windows.net/bplay')
