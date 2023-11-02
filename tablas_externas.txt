@@ -1,0 +1,32 @@
+/* Puede crear una base de datos que utlizando los arquivos Parquet en un datalake, pero le tengo que definir la estructura */
+
+CREATE EXTERNAL TABLE [dw].[calendario] (
+	[DateID] nvarchar(4000),
+	[CalendarDate] date,
+	[Periodo] nvarchar(4000),
+	[Year] int,
+	[Month] int,
+	[Day] int,
+	[Weekday] nvarchar(4000),
+	[Ejercicio_fiscal] int)
+
+	WITH 
+        (LOCATION = 'bplay/Calendario/**',
+          DATA_SOURCE = [desarrollo],
+          FILE_FORMAT = [PARQUET]	)
+
+--Drop EXTERNAL TABLE [dw].[calendario]
+
+/* tambien puedo Puede crear una base de datos que utlizando una query */
+
+CREATE EXTERNAL TABLE [dw].[calendario]
+
+WITH
+	(LOCATION = 'synapse/Calendario',
+    DATA_SOURCE = desarrollo,
+    FILE_FORMAT = PARQUET)
+AS
+
+Select *
+FROM OPENROWSET(BULK 'https://storageaccdesarrollo.dfs.core.windows.net/filesystemdesarrollo/bplay/Calendario/**',
+                FORMAT = 'PARQUET') a
