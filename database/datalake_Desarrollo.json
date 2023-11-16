@@ -1,0 +1,25 @@
+{
+	"name": "datalake_Desarrollo",
+	"properties": {
+		"Name": "datalake_Desarrollo",
+		"EntityType": "DATABASE",
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"Properties": {
+			"IsSyMSCDMDatabase": true
+		},
+		"Source": {
+			"Provider": "ADLS",
+			"Location": "abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.windows.net/test",
+			"Properties": {
+				"FormatType": "parquet",
+				"LinkedServiceName": "workspacedesarrollo-WorkspaceDefaultStorage"
+			}
+		},
+		"PublishStatus": "PUBLISHED",
+		"ObjectVersion": 11,
+		"ObjectId": "6741e9f3-eed9-4940-a341-726db66c453f"
+	},
+	"type": "DATABASE"
+}

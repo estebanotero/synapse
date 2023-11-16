@@ -1,0 +1,20 @@
+{
+	"name": "create view with partition",
+	"properties": {
+		"folder": {
+			"name": "Ejemplos de Queries"
+		},
+		"content": {
+			"query": "--drop view [view].orders\nCREATE view [view].orders AS\nSELECT\n    ORDER_ID\n    ,ORDER_Timestamp\n    ,Order_date\n    ,Order_Hora\n    ,CUSTOMER_ID\n    ,ORDER_STATUS\n    ,STORE_ID\n    ,a.filepath(1) as periodo\n    ,updated_timestamp\nFROM\n    OPENROWSET(\n        BULK 'https://storageaccdesarrollo.dfs.core.windows.net/udemy/cleansed/orders/Periodo=*/*.*',\n        FORMAT = 'PARQUET'\n    ) a\n--where a.filepath(1)='2021-08' Si quiero puedo invocar una sola particion o tomarla como parte del select utilizando filepath(1)=xxxxxx",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "Udemy",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

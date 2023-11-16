@@ -1,0 +1,20 @@
+{
+	"name": "Query Orders",
+	"properties": {
+		"folder": {
+			"name": "Udemy"
+		},
+		"content": {
+			"query": "--Puedo especificar a que particion quiero que lea usando filepath(1)\n\nSELECT\n    TOP 10 *\nFROM\n    OPENROWSET(\n        BULK 'https://storageaccdesarrollo.dfs.core.windows.net/udemy/cleansed/orders/Periodo=*/**',\n        FORMAT = 'PARQUET'\n    ) a\nwhere a.filepath(1)='2021-08'\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": -1
+		},
+		"type": "SqlQuery"
+	}
+}

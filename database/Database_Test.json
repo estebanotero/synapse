@@ -1,0 +1,25 @@
+{
+	"name": "Database_Test",
+	"properties": {
+		"Name": "Database_Test",
+		"EntityType": "DATABASE",
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"Properties": {
+			"IsSyMSCDMDatabase": true
+		},
+		"Source": {
+			"Provider": "ADLS",
+			"Location": "abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.windows.net/test",
+			"Properties": {
+				"FormatType": "parquet",
+				"LinkedServiceName": "workspacedesarrollo-WorkspaceDefaultStorage"
+			}
+		},
+		"PublishStatus": "PUBLISHED",
+		"ObjectVersion": 1,
+		"ObjectId": "dd907411-48f1-4a8a-8422-9be115bed8df"
+	},
+	"type": "DATABASE"
+}

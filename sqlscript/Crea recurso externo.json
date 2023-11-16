@@ -1,0 +1,20 @@
+{
+	"name": "Crea recurso externo",
+	"properties": {
+		"folder": {
+			"name": "Setup"
+		},
+		"content": {
+			"query": "--drop EXTERNAL DATA SOURCE [desarrollo2]\n\n--Creo conexion con el datalake \"desarrollo\"\nCREATE EXTERNAL DATA SOURCE [desarrollo]\nWITH (LOCATION = 'https://storageaccdesarrollo.dfs.core.windows.net/filesystemdesarrollo/')\n\n--otra forma de hacerlo es \nCREATE EXTERNAL DATA SOURCE [desarrollo2] \nWITH (LOCATION = 'abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.windows.net')\n\nCREATE EXTERNAL DATA SOURCE [produccion] \nWITH (LOCATION = 'https://storageaccproduccion.dfs.core.windows.net/bplay')\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "serverless_Desarrollo",
+				"poolName": "Built-in"
+			},
+			"resultLimit": -1
+		},
+		"type": "SqlQuery"
+	}
+}

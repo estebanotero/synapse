@@ -1,0 +1,20 @@
+{
+	"name": "Openrowset",
+	"properties": {
+		"folder": {
+			"name": "Ejemplos de Queries"
+		},
+		"content": {
+			"query": "Select top 10 *\nFROM OPENROWSET(BULK 'https://gomc.dfs.core.windows.net/udemy/orders/Periodo=*/**',\n                FORMAT = 'PARQUET') a\n\nFROM\n    OPENROWSET(\n        BULK 'https://gomc.dfs.core.windows.net/udemy/orders/Periodo=*/**',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n                udemy/cleansed/orders/STORE_ID=*/*.*'\n\n\n                https://gomc.dfs.core.windows.net/",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "Udemy",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

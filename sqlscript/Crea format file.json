@@ -1,0 +1,20 @@
+{
+	"name": "Crea format file",
+	"properties": {
+		"folder": {
+			"name": "Setup"
+		},
+		"content": {
+			"query": "--drop EXTERNAL FILE FORMAT [DELIMITEDTEXT]\n\nCREATE EXTERNAL FILE FORMAT [PARQUET] \nWITH (FORMAT_TYPE = PARQUET)\n\nCREATE EXTERNAL FILE FORMAT [DELIMITEDTEXT] \nWITH (FORMAT_TYPE = DELIMITEDTEXT)\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "serverless_Desarrollo",
+				"poolName": "Built-in"
+			},
+			"resultLimit": -1
+		},
+		"type": "SqlQuery"
+	}
+}

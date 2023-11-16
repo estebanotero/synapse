@@ -1,0 +1,38 @@
+{
+	"name": "Customer_SQL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "GOMC",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "customer",
+				"fileSystem": "sql"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "CUSTOMER_ID",
+				"type": "INT32"
+			},
+			{
+				"name": "FULL_NAME",
+				"type": "UTF8"
+			},
+			{
+				"name": "EMAIL_ADDRESS",
+				"type": "UTF8"
+			},
+			{
+				"name": "updated_timestamp",
+				"type": "INT96"
+			}
+		]
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

@@ -1,0 +1,20 @@
+{
+	"name": "create view",
+	"properties": {
+		"folder": {
+			"name": "Ejemplos de Queries"
+		},
+		"content": {
+			"query": "create view [view].[calendario] as\n\nSELECT\n    TOP 10 *\nFROM\n    OPENROWSET(\n        BULK 'https://storageaccdesarrollo.dfs.core.windows.net/filesystemdesarrollo/bplay/Calendario/**',\n        FORMAT = 'PARQUET'\n    ) AS [result]",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "serverless_Desarrollo",
+				"poolName": "Built-in"
+			},
+			"resultLimit": -1
+		},
+		"type": "SqlQuery"
+	}
+}

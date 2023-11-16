@@ -1,0 +1,25 @@
+{
+	"name": "Db_Produccion_bplay",
+	"properties": {
+		"Name": "Db_Produccion_bplay",
+		"EntityType": "DATABASE",
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"Properties": {
+			"IsSyMSCDMDatabase": true
+		},
+		"Source": {
+			"Provider": "ADLS",
+			"Location": "abfss://bplay@storageaccproduccion.dfs.core.windows.net/",
+			"Properties": {
+				"FormatType": "parquet",
+				"LinkedServiceName": "linkedservice_Produccion"
+			}
+		},
+		"PublishStatus": "PUBLISHED",
+		"ObjectVersion": 1,
+		"ObjectId": "0819fe3a-ce73-4f99-b3d3-b065737ff991"
+	},
+	"type": "DATABASE"
+}

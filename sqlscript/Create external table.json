@@ -1,0 +1,20 @@
+{
+	"name": "Create external table",
+	"properties": {
+		"folder": {
+			"name": "Ejemplos de Queries"
+		},
+		"content": {
+			"query": "/* Puede crear una base de datos que utlizando los arquivos Parquet en un datalake, pero le tengo que definir la estructura */\n\nCREATE EXTERNAL TABLE [dw].[calendario] (\n\t[DateID] nvarchar(4000),\n\t[CalendarDate] date,\n\t[Periodo] nvarchar(4000),\n\t[Year] int,\n\t[Month] int,\n\t[Day] int,\n\t[Weekday] nvarchar(4000),\n\t[Ejercicio_fiscal] int)\n\n\tWITH \n        (LOCATION = 'bplay/Calendario/**',\n          DATA_SOURCE = [desarrollo],\n          FILE_FORMAT = [PARQUET]\t)\n\n--Drop EXTERNAL TABLE [dw].[calendario]\n\n/* tambien puedo Puede crear una base de datos que utlizando una query */\n\nCREATE EXTERNAL TABLE [dw].[calendario]\n\nWITH\n\t(LOCATION = 'synapse/Calendario',\n    DATA_SOURCE = desarrollo,\n    FILE_FORMAT = PARQUET)\nAS\n\nSelect *\nFROM OPENROWSET(BULK 'https://storageaccdesarrollo.dfs.core.windows.net/filesystemdesarrollo/bplay/Calendario/**',\n                FORMAT = 'PARQUET') a\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "serverless_Desarrollo",
+				"poolName": "Built-in"
+			},
+			"resultLimit": -1
+		},
+		"type": "SqlQuery"
+	}
+}
