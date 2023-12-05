@@ -1,0 +1,60 @@
+{
+	"name": "AzureSqlTable_udemy_orders",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSQLmyFreeDB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "ORDER_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Order_timestamp",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "Order_date",
+				"type": "date"
+			},
+			{
+				"name": "Order_Hora",
+				"type": "varchar"
+			},
+			{
+				"name": "CUSTOMER_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ORDER_STATUS",
+				"type": "varchar"
+			},
+			{
+				"name": "STORE_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Periodo",
+				"type": "varchar"
+			},
+			{
+				"name": "updated_timestamp",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "udemy",
+			"table": "orders"
+		}
+	}
+}
