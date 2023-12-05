@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "workspacedesarrollo"
+		},
+		"AzureSQLmyFreeDB_connectionString": {
+			"value": ""
+		},
+		"GOMC_accountKey": {
+			"value": ""
+		},
+		"PostgreSql_GT_connectionString": {
+			"value": ""
+		},
+		"linkedservice_Produccion_accountKey": {
+			"value": ""
+		},
+		"workspacedesarrollo-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:workspacedesarrollo.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"GOMC_properties_typeProperties_url": {
+			"value": "https://gomc.dfs.core.windows.net/"
+		},
+		"linkedservice_Produccion_properties_typeProperties_url": {
+			"value": "https://storageaccproduccion.dfs.core.windows.net/"
+		},
+		"workspacedesarrollo-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://storageaccdesarrollo.dfs.core.windows.net"
+		}
+	}
+}

@@ -1,0 +1,2576 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"type": "string",
+			"metadata": "Workspace name",
+			"defaultValue": "workspacedesarrollo"
+		},
+		"AzureSQLmyFreeDB_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSQLmyFreeDB'"
+		},
+		"GOMC_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'GOMC'"
+		},
+		"PostgreSql_GT_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'PostgreSql_GT'"
+		},
+		"linkedservice_Produccion_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'linkedservice_Produccion'"
+		},
+		"workspacedesarrollo-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'workspacedesarrollo-WorkspaceDefaultSqlServer'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:workspacedesarrollo.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"GOMC_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://gomc.dfs.core.windows.net/"
+		},
+		"linkedservice_Produccion_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://storageaccproduccion.dfs.core.windows.net/"
+		},
+		"workspacedesarrollo-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://storageaccdesarrollo.dfs.core.windows.net"
+		}
+	},
+	"variables": {
+		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/Customer_Parquet')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Customer_SQL_Synapse",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Copia archivos parquet"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-11-03T21:39:54Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/dataflows/Customer_SQL_Synapse')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureSqlTable_udemy_orders')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSQLmyFreeDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ORDER_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Order_timestamp",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Order_date",
+						"type": "date"
+					},
+					{
+						"name": "Order_Hora",
+						"type": "varchar"
+					},
+					{
+						"name": "CUSTOMER_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ORDER_STATUS",
+						"type": "varchar"
+					},
+					{
+						"name": "STORE_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Periodo",
+						"type": "varchar"
+					},
+					{
+						"name": "updated_timestamp",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "udemy",
+					"table": "orders"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/AzureSQLmyFreeDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureSqlTipodeCambio')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSQLmyFreeDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "FECHA",
+						"type": "date"
+					},
+					{
+						"name": "ARS",
+						"type": "varchar"
+					},
+					{
+						"name": "BRL",
+						"type": "varchar"
+					},
+					{
+						"name": "CLP",
+						"type": "varchar"
+					},
+					{
+						"name": "PYG",
+						"type": "varchar"
+					},
+					{
+						"name": "UYU",
+						"type": "varchar"
+					},
+					{
+						"name": "BASE",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dw",
+					"table": "Tipo_de_cambio2"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/AzureSQLmyFreeDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Customer_SQL')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "GOMC",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "customer",
+						"fileSystem": "sql"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "CUSTOMER_ID",
+						"type": "INT32"
+					},
+					{
+						"name": "FULL_NAME",
+						"type": "UTF8"
+					},
+					{
+						"name": "EMAIL_ADDRESS",
+						"type": "UTF8"
+					},
+					{
+						"name": "updated_timestamp",
+						"type": "INT96"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/GOMC')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Customer_Synapse')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "GOMC",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "customer",
+						"fileSystem": "synapse"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/GOMC')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DestinationDataLakeProduccion')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "The destination data lake where the Dataverse data needs to land.",
+				"linkedServiceName": {
+					"referenceName": "linkedservice_Produccion",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"DestinationContainerName": {
+						"type": "string",
+						"defaultValue": "\"Destination Container Name\""
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": {
+							"value": "@dataset().DestinationContainerName",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/linkedservice_Produccion')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SourceDataLakeDesarrollo')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "The source data lake containing the Dataverse data that needs to be copied.",
+				"linkedServiceName": {
+					"referenceName": "workspacedesarrollo-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"SourceContainerName": {
+						"type": "string",
+						"defaultValue": "\"Dataverse Container Name\""
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bplay",
+						"fileSystem": {
+							"value": "@dataset().SourceContainerName",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/workspacedesarrollo-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureSQLmyFreeDB')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureSQLmyFreeDB_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/GOMC')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('GOMC_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('GOMC_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/PostgreSql_GT')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "PostgreSql",
+				"typeProperties": {
+					"connectionString": "[parameters('PostgreSql_GT_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/linkedservice_Produccion')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('linkedservice_Produccion_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('linkedservice_Produccion_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/workspacedesarrollo-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('workspacedesarrollo-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/workspacedesarrollo-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('workspacedesarrollo-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Customer_SQL_Synapse')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Customer_SQL",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Customer_Synapse",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          CUSTOMER_ID as integer,",
+						"          FULL_NAME as string,",
+						"          EMAIL_ADDRESS as string,",
+						"          updated_timestamp as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     format: 'parquet') ~> source1",
+						"source1 derive(updated_timestamp = currentTimestamp()) ~> derivedColumn1",
+						"derivedColumn1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     truncate: true,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/Customer_SQL')]",
+				"[concat(variables('workspaceId'), '/datasets/Customer_Synapse')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
+			"type": "Microsoft.Synapse/workspaces/credentials",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Crea format file')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Setup"
+				},
+				"content": {
+					"query": "--drop EXTERNAL FILE FORMAT [DELIMITEDTEXT]\n\nCREATE EXTERNAL FILE FORMAT [PARQUET] \nWITH (FORMAT_TYPE = PARQUET)\n\nCREATE EXTERNAL FILE FORMAT [DELIMITEDTEXT] \nWITH (FORMAT_TYPE = DELIMITEDTEXT)\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "serverless_Desarrollo",
+						"poolName": "Built-in"
+					},
+					"resultLimit": -1
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Crea recurso externo')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Setup"
+				},
+				"content": {
+					"query": "--drop EXTERNAL DATA SOURCE [desarrollo2]\n\n--Creo conexion con el datalake \"desarrollo\"\nCREATE EXTERNAL DATA SOURCE [desarrollo]\nWITH (LOCATION = 'https://storageaccdesarrollo.dfs.core.windows.net/filesystemdesarrollo/')\n\n--otra forma de hacerlo es \nCREATE EXTERNAL DATA SOURCE [desarrollo2] \nWITH (LOCATION = 'abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.windows.net')\n\nCREATE EXTERNAL DATA SOURCE [produccion] \nWITH (LOCATION = 'https://storageaccproduccion.dfs.core.windows.net/bplay')\n\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "serverless_Desarrollo",
+						"poolName": "Built-in"
+					},
+					"resultLimit": -1
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Create external table')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Ejemplos de Queries"
+				},
+				"content": {
+					"query": "/* Puede crear una base de datos que utlizando los arquivos Parquet en un datalake, pero le tengo que definir la estructura */\n\nCREATE EXTERNAL TABLE [dw].[calendario] (\n\t[DateID] nvarchar(4000),\n\t[CalendarDate] date,\n\t[Periodo] nvarchar(4000),\n\t[Year] int,\n\t[Month] int,\n\t[Day] int,\n\t[Weekday] nvarchar(4000),\n\t[Ejercicio_fiscal] int)\n\n\tWITH \n        (LOCATION = 'bplay/Calendario/**',\n          DATA_SOURCE = [desarrollo],\n          FILE_FORMAT = [PARQUET]\t)\n\n--Drop EXTERNAL TABLE [dw].[calendario]\n\n/* tambien puedo Puede crear una base de datos que utlizando una query */\n\nCREATE EXTERNAL TABLE [dw].[calendario]\n\nWITH\n\t(LOCATION = 'synapse/Calendario',\n    DATA_SOURCE = desarrollo,\n    FILE_FORMAT = PARQUET)\nAS\n\nSelect *\nFROM OPENROWSET(BULK 'https://storageaccdesarrollo.dfs.core.windows.net/filesystemdesarrollo/bplay/Calendario/**',\n                FORMAT = 'PARQUET') a\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "serverless_Desarrollo",
+						"poolName": "Built-in"
+					},
+					"resultLimit": -1
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Creo tablas para Apuestas_Deportivas')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "bplay"
+				},
+				"content": {
+					"query": "/* Puede crear tablas utlizando los arquivos Parquet en un datalake \"desarrollo\" */\n\n--Drop external table [dw].[calendario]\nCREATE EXTERNAL TABLE [dw].[calendario]\nWITH\n\t(LOCATION = 'Synapse/Calendario',\n    DATA_SOURCE = desarrollo,\n    FILE_FORMAT = PARQUET)\nAS\n\nSelect \n    Cast(DateID as bigint) as DateID,\n\tCalendarDate,\n\tPeriodo,\n\t[Year],\n\t[Month],\n\t[Day],\n\t[Weekday],\n\tEjercicio_fiscal\nFROM \n    OPENROWSET(BULK 'https://storageaccdesarrollo.dfs.core.windows.net/filesystemdesarrollo/bplay/Calendario/**',\n                FORMAT = 'PARQUET') a\n\n--Drop external table [dw].[Dim_Coupon]\nCREATE EXTERNAL TABLE [dw].[Dim_Coupon]\nWITH\n\t(LOCATION = 'Synapse/Dim_Coupon',\n    DATA_SOURCE = desarrollo,\n    FILE_FORMAT = PARQUET)\nAS\n\nSELECT\n     [resolution_date]\n    ,[fecha_resolucion]\n    ,[hora_resolucion]\n    ,[coupon_id]\n    ,[coupon_size]\n    ,[live_betting]\n    ,[coupon_odds]\n    ,[coupon_stake]\n    ,[coupon_status_id]\n    ,[coupon_status]\n FROM \n    OPENROWSET(BULK 'https://storageaccdesarrollo.dfs.core.windows.net/filesystemdesarrollo/bplay/Dim_Coupon/**',\n                FORMAT = 'PARQUET') a\n\n--Drop external table [dw].[Dim_Event]\nCREATE EXTERNAL TABLE [dw].[Dim_Event]\nWITH\n\t(LOCATION = 'Synapse/Dim_Event',\n    DATA_SOURCE = desarrollo,\n    FILE_FORMAT = PARQUET)\nAS\n\nSELECT\n     [event_id]\n    ,[event_name]\n    ,[event_date]\n    ,[Fecha_Evento]\n    ,[Hora_Evento]\n    ,[sport]\n    ,[competition]\n    ,[region]\n    ,[provider_id]\n FROM \n    OPENROWSET(BULK 'https://storageaccdesarrollo.dfs.core.windows.net/filesystemdesarrollo/bplay/Dim_Event/**',\n                FORMAT = 'PARQUET') a\n\n--Drop external table [dw].[Dim_Player]\nCREATE EXTERNAL TABLE [dw].[Dim_Player]\nWITH\n\t(LOCATION = 'Synapse/Dim_Player',\n    DATA_SOURCE = desarrollo,\n    FILE_FORMAT = PARQUET)\nAS\n\nSELECT \n    [partner_id]\n    ,[Jurisdiccion]\n    ,[player_type_id]\n    ,[player_type]\n    ,[partner_player_id]\n    ,[player_id]\n    ,[dias_antiguedad]\n    ,[created_date]\n    ,[valido_desde]\n    ,[fecha_exclusion]\n    ,[fecha_registro]\n    ,[hora_registro]\n    ,[camada_registro]\n    ,[zip_code]\n    ,[player_city]\n    ,[partner_state_id]\n    ,[player_state]\n    ,[partner_country_id]\n    ,[player_country]\n    ,[rango_edad]\n    ,[DNI]\n    ,[sexo]\n    ,[email]\n    ,[phone]\n    ,[address]\n    ,[player_source_id]\n    ,[player_source]\n    ,[nombre]\n    ,[apellido]\n    ,[fecha_nacimiento]\n    ,[edad]\n    ,[player_alias]\n    ,[usuario]\n    ,[player_status_id]\n    ,[player_status]\n    ,[partner_affiliate_id]\n    ,[player_affiliate]\n    FROM \n    OPENROWSET(BULK 'https://storageaccdesarrollo.dfs.core.windows.net/filesystemdesarrollo/bplay/Dim_Player/**',\n                FORMAT = 'PARQUET') a\n\n--Drop external table [dw].[Fact_Coupon_Row]\nCREATE EXTERNAL TABLE [dw].[Fact_Coupon_Row]\nWITH\n\t(LOCATION = 'Synapse/Fact_Coupon_Row',\n    DATA_SOURCE = desarrollo,\n    FILE_FORMAT = PARQUET)\nAS\n\nSELECT\n    [created_date]\n    ,[fecha_apuesta]\n    ,[hora_apuesta]\n    ,[player_type_id]\n    ,Cast([partner_player_id] as BIGINT) as partner_player_id\n    ,[partner_id]\n    ,[balance_type_id]\n    ,[combination_status_id]\n    ,[combination_status]\n    ,[operation_type_id]\n    ,[room_id]\n    ,[provider_id]\n    ,[market]\n    ,[bet_offer_description]\n    ,[row_odds]\n    ,[combination_odds]\n    ,[combiantion_stake]\n    ,[row_amount]\n    ,[bet_type_id]\n    ,[bet_type]\n    ,[live_betting]\n    ,[coupon_channel]\n    ,[partner_event_id] \n    ,[event_id]\n    ,[player_id]\n    ,[partner_couponrow_id] \n    ,[coupon_row_id]\n    ,[coupon_id]\n    ,[row_id]\n    ,[bet_size]\nFROM \n    OPENROWSET(BULK 'https://storageaccdesarrollo.dfs.core.windows.net/filesystemdesarrollo/bplay/Fact_Coupon_Row/**',\n                FORMAT = 'PARQUET') a",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "serverless_Desarrollo",
+						"poolName": "Built-in"
+					},
+					"resultLimit": -1
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Openrowset')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Ejemplos de Queries"
+				},
+				"content": {
+					"query": "Select top 10 *\nFROM OPENROWSET(BULK 'https://gomc.dfs.core.windows.net/udemy/orders/Periodo=*/**',\n                FORMAT = 'PARQUET') a\n\nFROM\n    OPENROWSET(\n        BULK 'https://gomc.dfs.core.windows.net/udemy/orders/Periodo=*/**',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n                udemy/cleansed/orders/STORE_ID=*/*.*'\n\n\n                https://gomc.dfs.core.windows.net/",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "Udemy",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Query Customers')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Udemy"
+				},
+				"content": {
+					"query": "SELECT\n    TOP 10 *\nFROM\n    OPENROWSET(\n        BULK 'https://storageaccdesarrollo.dfs.core.windows.net/udemy/cleansed/customers/**',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Query Orders')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Udemy"
+				},
+				"content": {
+					"query": "--Puedo especificar a que particion quiero que lea usando filepath(1)\n\nSELECT\n    TOP 10 *\nFROM\n    OPENROWSET(\n        BULK 'https://storageaccdesarrollo.dfs.core.windows.net/udemy/cleansed/orders/Periodo=*/**',\n        FORMAT = 'PARQUET'\n    ) a\nwhere a.filepath(1)='2021-08'\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": -1
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create view with partition')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Ejemplos de Queries"
+				},
+				"content": {
+					"query": "--drop view [view].orders\nCREATE view [view].orders AS\nSELECT\n    ORDER_ID\n    ,ORDER_Timestamp\n    ,Order_date\n    ,Order_Hora\n    ,CUSTOMER_ID\n    ,ORDER_STATUS\n    ,STORE_ID\n    ,a.filepath(1) as periodo\n    ,updated_timestamp\nFROM\n    OPENROWSET(\n        BULK 'https://storageaccdesarrollo.dfs.core.windows.net/udemy/cleansed/orders/Periodo=*/*.*',\n        FORMAT = 'PARQUET'\n    ) a\n--where a.filepath(1)='2021-08' Si quiero puedo invocar una sola particion o tomarla como parte del select utilizando filepath(1)=xxxxxx",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "Udemy",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create view')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Ejemplos de Queries"
+				},
+				"content": {
+					"query": "create view [view].[calendario] as\n\nSELECT\n    TOP 10 *\nFROM\n    OPENROWSET(\n        BULK 'https://storageaccdesarrollo.dfs.core.windows.net/filesystemdesarrollo/bplay/Calendario/**',\n        FORMAT = 'PARQUET'\n    ) AS [result]",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "serverless_Desarrollo",
+						"poolName": "Built-in"
+					},
+					"resultLimit": -1
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Database_Test')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "Database_Test",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.windows.net/test",
+								"Properties": {
+									"FormatType": "parquet",
+									"LinkedServiceName": "workspacedesarrollo-WorkspaceDefaultStorage"
+								}
+							},
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "dd907411-48f1-4a8a-8422-9be115bed8df"
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Db_Produccion_bplay')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "Db_Produccion_bplay",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://bplay@storageaccproduccion.dfs.core.windows.net/",
+								"Properties": {
+									"FormatType": "parquet",
+									"LinkedServiceName": "linkedservice_Produccion"
+								}
+							},
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "0819fe3a-ce73-4f99-b3d3-b065737ff991"
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/datalake_Desarrollo')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "datalake_Desarrollo",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.windows.net/test",
+								"Properties": {
+									"FormatType": "parquet",
+									"LinkedServiceName": "workspacedesarrollo-WorkspaceDefaultStorage"
+								}
+							},
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 11,
+							"ObjectId": "6741e9f3-eed9-4940-a341-726db66c453f"
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					},
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "Calendario",
+							"EntityType": "TABLE",
+							"TableType": "EXTERNAL",
+							"Namespace": {
+								"SchemaName": null,
+								"DatabaseName": "datalake_Desarrollo",
+								"DatabaseId": null
+							},
+							"Partitioning": {
+								"PartitionFunctionType": null,
+								"Keys": null
+							},
+							"StorageDescriptor": {
+								"Distribution": null,
+								"Columns": [
+									{
+										"Name": "DateID",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "integer",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "integer"
+											}
+										}
+									},
+									{
+										"Name": "CalendarDate",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "date",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"DateFormat": "YYYY-MM-DD",
+												"HIVE_TYPE_STRING": "date"
+											}
+										}
+									},
+									{
+										"Name": "Periodo",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "Year",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "short",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "short"
+											}
+										}
+									},
+									{
+										"Name": "Month",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "short",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "short"
+											}
+										}
+									},
+									{
+										"Name": "Day",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "short",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "short"
+											}
+										}
+									},
+									{
+										"Name": "Weekday",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "Ejercicio_fiscal",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "integer",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "integer"
+											}
+										}
+									}
+								],
+								"ColumnSetEntityName": "393f8fe6-5084-4ab7-a44b-8f2040c215b0",
+								"Format": {
+									"InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
+									"OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+									"FormatType": "parquet",
+									"SerializeLib": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+									"Properties": {
+										"path": "abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.windows.net/bplay/Calendario",
+										"FormatTypeSetToDatabaseDefault": false
+									}
+								},
+								"Source": {
+									"Provider": "ADLS",
+									"Location": "abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.windows.net/bplay/Calendario",
+									"Properties": {
+										"LinkedServiceName": "workspacedesarrollo-WorkspaceDefaultStorage",
+										"LocationSetToDatabaseDefault": false
+									}
+								},
+								"Properties": {
+									"textinputformat.record.delimiter": ",",
+									"compression": "{\"type\":\"Snappy\",\"level\":\"optimal\"}",
+									"derivedModelAttributeInfo": "{\"attributeReferences\":{}}"
+								},
+								"Compressed": false,
+								"SerDeInfo": null,
+								"IsStoredAsSubdirectories": false
+							},
+							"Owner": null,
+							"CreateTime": 0,
+							"LastAccessTime": 0,
+							"Retention": 0,
+							"Temporary": false,
+							"IsRewriteEnabled": false,
+							"ViewOriginalText": null,
+							"ViewExpandedText": null,
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"OriginObjectId": null,
+							"IsSharedEntity": false,
+							"PublishStatus": "PUBLISHED",
+							"Properties": {
+								"Description": "",
+								"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
+								"PrimaryKeys": "",
+								"spark.sql.sources.provider": "parquet",
+								"spark.sql.sources.schema.numParts": "1",
+								"spark.sql.sources.schema.part.0": "{\"type\":\"struct\",\"fields\":[{\"name\":\"DateID\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}},{\"name\":\"CalendarDate\",\"type\":\"date\",\"nullable\":true,\"metadata\":{}},{\"name\":\"Periodo\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"Year\",\"type\":\"short\",\"nullable\":true,\"metadata\":{}},{\"name\":\"Month\",\"type\":\"short\",\"nullable\":true,\"metadata\":{}},{\"name\":\"Day\",\"type\":\"short\",\"nullable\":true,\"metadata\":{}},{\"name\":\"Weekday\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"Ejercicio_fiscal\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}}]}",
+								"spark.sql.partitionProvider": "catalog"
+							},
+							"ObjectVersion": 3,
+							"ObjectId": "cceb0b44-cd6a-4e55-ad88-fd3751689d3c",
+							"Description": ""
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					},
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "Dim_Event",
+							"EntityType": "TABLE",
+							"TableType": "EXTERNAL",
+							"Namespace": {
+								"SchemaName": null,
+								"DatabaseName": "datalake_Desarrollo",
+								"DatabaseId": null
+							},
+							"StorageDescriptor": {
+								"Distribution": null,
+								"Columns": [
+									{
+										"Name": "event_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										}
+									},
+									{
+										"Name": "event_name",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "event_date",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "timestamp",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"TimestampFormat": "YYYY-MM-DD HH:MM:SS.fffffffff",
+												"HIVE_TYPE_STRING": "timestamp"
+											}
+										}
+									},
+									{
+										"Name": "Fecha_Evento",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "date",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"DateFormat": "YYYY-MM-DD",
+												"HIVE_TYPE_STRING": "date"
+											}
+										}
+									},
+									{
+										"Name": "Hora_Evento",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "sport",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "competition",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "region",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "provider_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "integer",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "integer"
+											}
+										}
+									}
+								],
+								"ColumnSetEntityName": "3820f84c-a8e0-4ebd-8370-49658f3e314a",
+								"Format": {
+									"InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
+									"OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+									"FormatType": "parquet",
+									"SerializeLib": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+									"Properties": {
+										"path": "abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.windows.net/bplay/Dim_Event",
+										"FormatTypeSetToDatabaseDefault": false
+									}
+								},
+								"Source": {
+									"Provider": "ADLS",
+									"Location": "abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.windows.net/bplay/Dim_Event",
+									"Properties": {
+										"LinkedServiceName": "workspacedesarrollo-WorkspaceDefaultStorage",
+										"LocationSetToDatabaseDefault": false
+									}
+								},
+								"Properties": {
+									"textinputformat.record.delimiter": ",",
+									"compression": "{\"type\":\"None\",\"level\":\"optimal\"}",
+									"derivedModelAttributeInfo": "{\"attributeReferences\":{}}"
+								},
+								"Compressed": false,
+								"SerDeInfo": null,
+								"IsStoredAsSubdirectories": false
+							},
+							"Owner": null,
+							"CreateTime": 0,
+							"LastAccessTime": 0,
+							"Retention": 0,
+							"Temporary": false,
+							"IsRewriteEnabled": false,
+							"ViewOriginalText": null,
+							"ViewExpandedText": null,
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"OriginObjectId": null,
+							"IsSharedEntity": false,
+							"PublishStatus": "PUBLISHED",
+							"Properties": {
+								"Description": "",
+								"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
+								"PrimaryKeys": "",
+								"spark.sql.sources.provider": "parquet",
+								"spark.sql.sources.schema.numParts": "1",
+								"spark.sql.sources.schema.part.0": "{\"type\":\"struct\",\"fields\":[{\"name\":\"event_id\",\"type\":\"long\",\"nullable\":true,\"metadata\":{}},{\"name\":\"event_name\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"event_date\",\"type\":\"timestamp\",\"nullable\":true,\"metadata\":{}},{\"name\":\"Fecha_Evento\",\"type\":\"date\",\"nullable\":true,\"metadata\":{}},{\"name\":\"Hora_Evento\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"sport\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"competition\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"region\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"provider_id\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}}]}"
+							},
+							"ObjectVersion": 2,
+							"ObjectId": "fb44bfbc-ba08-4c18-a38b-43394ec3a200",
+							"Description": ""
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					},
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "Dim_Player",
+							"EntityType": "TABLE",
+							"TableType": "EXTERNAL",
+							"Namespace": {
+								"SchemaName": null,
+								"DatabaseName": "datalake_Desarrollo",
+								"DatabaseId": null
+							},
+							"Partitioning": {
+								"PartitionFunctionType": null,
+								"Keys": null
+							},
+							"StorageDescriptor": {
+								"Distribution": null,
+								"Columns": [
+									{
+										"Name": "partner_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "short",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "short"
+											}
+										}
+									},
+									{
+										"Name": "Jurisdiccion",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "player_type_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "short",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "short"
+											}
+										}
+									},
+									{
+										"Name": "player_type",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "partner_player_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										}
+									},
+									{
+										"Name": "player_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "integer",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "integer"
+											}
+										}
+									},
+									{
+										"Name": "player_alias",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "usuario",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "player_status_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "short",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "short"
+											}
+										}
+									},
+									{
+										"Name": "player_status",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "partner_affiliate_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										}
+									},
+									{
+										"Name": "player_affiliate",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "player_source_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										}
+									},
+									{
+										"Name": "player_source",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "nombre",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "apellido",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "fecha_nacimiento",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "date",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"DateFormat": "YYYY-MM-DD",
+												"HIVE_TYPE_STRING": "date"
+											}
+										}
+									},
+									{
+										"Name": "edad",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "integer",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "integer"
+											}
+										}
+									},
+									{
+										"Name": "rango_edad",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "DNI",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "sexo",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "email",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "phone",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "address",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "zip_code",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "player_city",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "partner_state_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										}
+									},
+									{
+										"Name": "player_state",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "partner_country_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										}
+									},
+									{
+										"Name": "player_country",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "created_date",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "timestamp",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"TimestampFormat": "YYYY-MM-DD HH:MM:SS.fffffffff",
+												"HIVE_TYPE_STRING": "timestamp"
+											}
+										}
+									},
+									{
+										"Name": "valido_desde",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "timestamp",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"TimestampFormat": "YYYY-MM-DD HH:MM:SS.fffffffff",
+												"HIVE_TYPE_STRING": "timestamp"
+											}
+										}
+									},
+									{
+										"Name": "fecha_exclusion",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "date",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"DateFormat": "YYYY-MM-DD",
+												"HIVE_TYPE_STRING": "date"
+											}
+										}
+									},
+									{
+										"Name": "fecha_registro",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "date",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"DateFormat": "YYYY-MM-DD",
+												"HIVE_TYPE_STRING": "date"
+											}
+										}
+									},
+									{
+										"Name": "hora_registro",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "camada_registro",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "dias_antiguedad",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "integer",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "integer"
+											}
+										}
+									}
+								],
+								"ColumnSetEntityName": "d6b889d4-e943-48be-b71d-4f59515c36a7",
+								"Format": {
+									"InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
+									"OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+									"FormatType": "parquet",
+									"SerializeLib": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+									"Properties": {
+										"path": "abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.windows.net/bplay/Dim_Player",
+										"FormatTypeSetToDatabaseDefault": false
+									}
+								},
+								"Source": {
+									"Provider": "ADLS",
+									"Location": "abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.windows.net/bplay/Dim_Player",
+									"Properties": {
+										"LinkedServiceName": "workspacedesarrollo-WorkspaceDefaultStorage",
+										"LocationSetToDatabaseDefault": false
+									}
+								},
+								"Properties": {
+									"textinputformat.record.delimiter": ",",
+									"compression": "{\"type\":\"None\",\"level\":\"optimal\"}",
+									"derivedModelAttributeInfo": "{\"attributeReferences\":{}}"
+								},
+								"Compressed": false,
+								"SerDeInfo": null,
+								"IsStoredAsSubdirectories": false
+							},
+							"Owner": null,
+							"CreateTime": 0,
+							"LastAccessTime": 0,
+							"Retention": 0,
+							"Temporary": false,
+							"IsRewriteEnabled": false,
+							"ViewOriginalText": null,
+							"ViewExpandedText": null,
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"OriginObjectId": null,
+							"IsSharedEntity": false,
+							"PublishStatus": "PUBLISHED",
+							"Properties": {
+								"Description": "",
+								"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
+								"PrimaryKeys": "",
+								"spark.sql.sources.provider": "parquet",
+								"spark.sql.sources.schema.numParts": "1",
+								"spark.sql.sources.schema.part.0": "{\"type\":\"struct\",\"fields\":[{\"name\":\"partner_id\",\"type\":\"short\",\"nullable\":true,\"metadata\":{}},{\"name\":\"Jurisdiccion\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"player_type_id\",\"type\":\"short\",\"nullable\":true,\"metadata\":{}},{\"name\":\"player_type\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"partner_player_id\",\"type\":\"long\",\"nullable\":true,\"metadata\":{}},{\"name\":\"player_id\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}},{\"name\":\"player_alias\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"usuario\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"player_status_id\",\"type\":\"short\",\"nullable\":true,\"metadata\":{}},{\"name\":\"player_status\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"partner_affiliate_id\",\"type\":\"long\",\"nullable\":true,\"metadata\":{}},{\"name\":\"player_affiliate\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"player_source_id\",\"type\":\"long\",\"nullable\":true,\"metadata\":{}},{\"name\":\"player_source\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"nombre\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"apellido\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"fecha_nacimiento\",\"type\":\"date\",\"nullable\":true,\"metadata\":{}},{\"name\":\"edad\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}},{\"name\":\"rango_edad\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"DNI\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"sexo\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"email\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"phone\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"address\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"zip_code\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"player_city\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"partner_state_id\",\"type\":\"long\",\"nullable\":true,\"metadata\":{}},{\"name\":\"player_state\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"partner_country_id\",\"type\":\"long\",\"nullable\":true,\"metadata\":{}},{\"name\":\"player_country\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"created_date\",\"type\":\"timestamp\",\"nullable\":true,\"metadata\":{}},{\"name\":\"valido_desde\",\"type\":\"timestamp\",\"nullable\":true,\"metadata\":{}},{\"name\":\"fecha_exclusion\",\"type\":\"date\",\"nullable\":true,\"metadata\":{}},{\"name\":\"fecha_registro\",\"type\":\"date\",\"nullable\":true,\"metadata\":{}},{\"name\":\"hora_registro\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"camada_registro\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"dias_antiguedad\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}}]}"
+							},
+							"ObjectVersion": 2,
+							"ObjectId": "a9ea960f-8761-47bf-9735-f89699b2f263",
+							"Description": ""
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					},
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "Fact_Cuopon_Row",
+							"EntityType": "TABLE",
+							"TableType": "EXTERNAL",
+							"Namespace": {
+								"SchemaName": null,
+								"DatabaseName": "datalake_Desarrollo",
+								"DatabaseId": null
+							},
+							"Partitioning": {
+								"PartitionFunctionType": null,
+								"Keys": null
+							},
+							"StorageDescriptor": {
+								"Distribution": null,
+								"Columns": [
+									{
+										"Name": "created_date",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "timestamp",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"TimestampFormat": "YYYY-MM-DD HH:MM:SS.fffffffff",
+												"HIVE_TYPE_STRING": "timestamp"
+											}
+										}
+									},
+									{
+										"Name": "fecha_apuesta",
+										"Description": "",
+										"OriginDataTypeName": {
+											"TypeName": "date",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"DateFormat": "YYYY-MM-DD",
+												"HIVE_TYPE_STRING": "date"
+											}
+										}
+									},
+									{
+										"Name": "hora_apuesta",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "player_type_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "short",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "short"
+											}
+										}
+									},
+									{
+										"Name": "partner_player_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										}
+									},
+									{
+										"Name": "partner_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "short",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "short"
+											}
+										}
+									},
+									{
+										"Name": "player_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "integer",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "integer"
+											}
+										}
+									},
+									{
+										"Name": "partner_couponrow_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										}
+									},
+									{
+										"Name": "coupon_row_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										}
+									},
+									{
+										"Name": "coupon_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										}
+									},
+									{
+										"Name": "row_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										}
+									},
+									{
+										"Name": "bet_size",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "short",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "short"
+											}
+										}
+									},
+									{
+										"Name": "bet_type_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "integer",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "integer"
+											}
+										}
+									},
+									{
+										"Name": "bet_type",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "live_betting",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "coupon_channel",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "partner_event_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										}
+									},
+									{
+										"Name": "event_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										}
+									},
+									{
+										"Name": "market",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "bet_offer_description",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "row_odds",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "decimal",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 10,
+											"Scale": 4,
+											"Properties": {
+												"HIVE_TYPE_STRING": "decimal"
+											}
+										}
+									},
+									{
+										"Name": "combination_odds",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "decimal",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 10,
+											"Scale": 4,
+											"Properties": {
+												"HIVE_TYPE_STRING": "decimal"
+											}
+										}
+									},
+									{
+										"Name": "combiantion_stake",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "decimal",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 10,
+											"Scale": 2,
+											"Properties": {
+												"HIVE_TYPE_STRING": "decimal"
+											}
+										}
+									},
+									{
+										"Name": "row_amount",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "decimal",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 25,
+											"Scale": 13,
+											"Properties": {
+												"HIVE_TYPE_STRING": "decimal"
+											}
+										}
+									},
+									{
+										"Name": "balance_type_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "integer",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "integer"
+											}
+										}
+									},
+									{
+										"Name": "combination_status_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "integer",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "integer"
+											}
+										}
+									},
+									{
+										"Name": "combination_status",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									},
+									{
+										"Name": "operation_type_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "integer",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "integer"
+											}
+										}
+									},
+									{
+										"Name": "room_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "integer",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "integer"
+											}
+										}
+									},
+									{
+										"Name": "provider_id",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "integer",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "integer"
+											}
+										}
+									}
+								],
+								"ColumnSetEntityName": "22fa601d-b292-4717-bbf4-791499b44183",
+								"Format": {
+									"InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
+									"OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+									"FormatType": "parquet",
+									"SerializeLib": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+									"Properties": {
+										"path": "abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.windows.net/bplay/Fact_Coupon_Row",
+										"FormatTypeSetToDatabaseDefault": false
+									}
+								},
+								"Source": {
+									"Provider": "ADLS",
+									"Location": "abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.windows.net/bplay/Fact_Coupon_Row",
+									"Properties": {
+										"LinkedServiceName": "workspacedesarrollo-WorkspaceDefaultStorage",
+										"LocationSetToDatabaseDefault": false
+									}
+								},
+								"Properties": {
+									"textinputformat.record.delimiter": ",",
+									"compression": "{\"type\":\"Snappy\",\"level\":\"optimal\"}",
+									"derivedModelAttributeInfo": "{\"attributeReferences\":{}}"
+								},
+								"Compressed": false,
+								"SerDeInfo": null,
+								"IsStoredAsSubdirectories": false
+							},
+							"Owner": null,
+							"CreateTime": 0,
+							"LastAccessTime": 0,
+							"Retention": 0,
+							"Temporary": false,
+							"IsRewriteEnabled": false,
+							"ViewOriginalText": null,
+							"ViewExpandedText": null,
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"OriginObjectId": null,
+							"IsSharedEntity": false,
+							"PublishStatus": "PUBLISHED",
+							"Properties": {
+								"Description": "",
+								"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
+								"PrimaryKeys": "",
+								"spark.sql.sources.provider": "parquet",
+								"spark.sql.sources.schema.numParts": "1",
+								"spark.sql.sources.schema.part.0": "{\"type\":\"struct\",\"fields\":[{\"name\":\"created_date\",\"type\":\"timestamp\",\"nullable\":true,\"metadata\":{}},{\"name\":\"fecha_apuesta\",\"type\":\"date\",\"nullable\":true,\"metadata\":{}},{\"name\":\"hora_apuesta\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"player_type_id\",\"type\":\"short\",\"nullable\":true,\"metadata\":{}},{\"name\":\"partner_player_id\",\"type\":\"long\",\"nullable\":true,\"metadata\":{}},{\"name\":\"partner_id\",\"type\":\"short\",\"nullable\":true,\"metadata\":{}},{\"name\":\"player_id\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}},{\"name\":\"partner_couponrow_id\",\"type\":\"long\",\"nullable\":true,\"metadata\":{}},{\"name\":\"coupon_row_id\",\"type\":\"long\",\"nullable\":true,\"metadata\":{}},{\"name\":\"coupon_id\",\"type\":\"long\",\"nullable\":true,\"metadata\":{}},{\"name\":\"row_id\",\"type\":\"long\",\"nullable\":true,\"metadata\":{}},{\"name\":\"bet_size\",\"type\":\"short\",\"nullable\":true,\"metadata\":{}},{\"name\":\"bet_type_id\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}},{\"name\":\"bet_type\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"live_betting\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"coupon_channel\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"partner_event_id\",\"type\":\"long\",\"nullable\":true,\"metadata\":{}},{\"name\":\"event_id\",\"type\":\"long\",\"nullable\":true,\"metadata\":{}},{\"name\":\"market\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"bet_offer_description\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"row_odds\",\"type\":\"decimal(10,4)\",\"nullable\":true,\"metadata\":{}},{\"name\":\"combination_odds\",\"type\":\"decimal(10,4)\",\"nullable\":true,\"metadata\":{}},{\"name\":\"combiantion_stake\",\"type\":\"decimal(10,2)\",\"nullable\":true,\"metadata\":{}},{\"name\":\"row_amount\",\"type\":\"decimal(25,13)\",\"nullable\":true,\"metadata\":{}},{\"name\":\"balance_type_id\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}},{\"name\":\"combination_status_id\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}},{\"name\":\"combination_status\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"operation_type_id\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}},{\"name\":\"room_id\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}},{\"name\":\"provider_id\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}}]}"
+							},
+							"ObjectVersion": 2,
+							"ObjectId": "e5142369-8046-4f34-a7e1-9fe7fac5cca9",
+							"Description": ""
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					},
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "relationship-pnuvbdbzyj",
+							"EntityType": "RELATIONSHIP",
+							"Namespace": {
+								"DatabaseName": "datalake_Desarrollo"
+							},
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"FromTableName": "Fact_Cuopon_Row",
+							"ToTableName": "Dim_Event",
+							"ColumnRelationshipInformations": [
+								{
+									"FromColumnName": "event_id",
+									"ToColumnName": "event_id"
+								}
+							],
+							"RelationshipType": 0,
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "047e4e02-634f-4e0f-b7a8-afcc77687dea",
+							"Properties": {}
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					},
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "relationship-qajmiuoegj",
+							"EntityType": "RELATIONSHIP",
+							"Namespace": {
+								"DatabaseName": "datalake_Desarrollo"
+							},
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"FromTableName": "Fact_Cuopon_Row",
+							"ToTableName": "Dim_Player",
+							"ColumnRelationshipInformations": [
+								{
+									"FromColumnName": "partner_player_id",
+									"ToColumnName": "partner_player_id"
+								}
+							],
+							"RelationshipType": 0,
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "00bb3d93-bb3b-4089-ad55-cd651afedcd6",
+							"Properties": {}
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					},
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "relationship-szgrbelkeg",
+							"EntityType": "RELATIONSHIP",
+							"Namespace": {
+								"DatabaseName": "datalake_Desarrollo"
+							},
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"FromTableName": "Fact_Cuopon_Row",
+							"ToTableName": "Calendario",
+							"ColumnRelationshipInformations": [
+								{
+									"FromColumnName": "fecha_apuesta",
+									"ToColumnName": "CalendarDate"
+								}
+							],
+							"RelationshipType": 0,
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "a63ff81d-3f7f-42a6-832f-ebff38e39604",
+							"Properties": {}
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ApacheSparkPool')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"autoPause": {
+					"enabled": true,
+					"delayInMinutes": 10
+				},
+				"autoScale": {
+					"enabled": true,
+					"maxNodeCount": 3,
+					"minNodeCount": 3
+				},
+				"nodeCount": 10,
+				"nodeSize": "Small",
+				"nodeSizeFamily": "MemoryOptimized",
+				"sparkVersion": "3.3",
+				"isComputeIsolationEnabled": false,
+				"sessionLevelPackagesEnabled": true,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "brazilsouth"
+		}
+	]
+}
