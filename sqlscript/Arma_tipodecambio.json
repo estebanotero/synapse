@@ -1,5 +1,5 @@
 {
-	"name": "SQL script 3",
+	"name": "Arma_tipodecambio",
 	"properties": {
 		"content": {
 			"query": "CREATE EXTERNAL TABLE [dw].[Tipo_Cambio]\nWITH\n\t(LOCATION = 'Synapse/Tipo_Cambio',\n    DATA_SOURCE = desarrollo,\n    FILE_FORMAT = PARQUET)\nAS\n\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'https://storageaccdesarrollo.dfs.core.windows.net/filesystemdesarrollo/bplay/Tipo_Cambio/part-00000-b90b69af-c828-453a-89d6-d4b801af0e9d-c000.snappy.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
@@ -10,7 +10,7 @@
 				"databaseName": "serverless_Desarrollo",
 				"poolName": "Built-in"
 			},
-			"resultLimit": 5000
+			"resultLimit": -1
 		},
 		"type": "SqlQuery"
 	}
