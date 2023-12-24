@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 4",
+	"properties": {
+		"content": {
+			"query": "SELECT TOP (100) [Fecha]\n,[ARS]\n,[BRL]\n,[EUR]\n,[CLP]\n,[PYG]\n,[UYU]\n,[Base]\n FROM [dw].[Tipo_Cambio]",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "serverless_Desarrollo",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
