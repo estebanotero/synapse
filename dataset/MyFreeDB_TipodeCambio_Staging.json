@@ -1,5 +1,5 @@
 {
-	"name": "AzureSqlTipodeCambio",
+	"name": "MyFreeDB_TipodeCambio_Staging",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureSQLmyFreeDB",
@@ -39,7 +39,7 @@
 		],
 		"typeProperties": {
 			"schema": "dw",
-			"table": "Tipo_de_cambio2"
+			"table": "TipoCambio_staging"
 		}
 	},
 	"type": "Microsoft.Synapse/workspaces/datasets"
