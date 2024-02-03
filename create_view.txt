@@ -1,0 +1,44 @@
+#creo un esquema para ordenar las views
+
+CREATE SCHEMA [dw]
+
+#creo la vista a partir de cvs que esta en un BLOB_STORAGE
+
+CREATE or ALTER VIEW [dw].tc as
+SELECT
+     Cast(fecha as date) as fecha,
+     base,
+     Cast(ARS as MONEY) as ARS,
+     Cast(BRL as MONEY) as BRL,
+     Cast(EUR as MONEY) as EUR,
+     Cast(CLP as MONEY) as CLP,
+     Cast(PYG as MONEY) as PYG,
+     Cast(UYU as MONEY) as UYU
+FROM
+    OPENROWSET(
+        BULK 'https://storagecapacitaciones.dfs.core.windows.net/fscapacitaciones/Tipo_Cambio/tc.csv',
+        FORMAT = 'CSV',
+        PARSER_VERSION = '2.0',
+        HEADER_ROW= TRUE
+    ) AS [result]
+
+
+#creo vista de tabla calendario casteando lo fecha para que no sea datetime
+
+CREATE or ALTER VIEW [dw].calendario as
+SELECT
+    [dateID] as IDdate,
+    cast(fecha as date) as fecha,
+    [periodo],
+    [year],
+    [month],
+    [day],
+    [weekday],
+    [ejercicio_fiscal]
+FROM
+    OPENROWSET(
+        BULK 'https://storagecapacitaciones.dfs.core.windows.net/fscapacitaciones/Calendario/calendario.csv',
+        FORMAT = 'CSV',
+        PARSER_VERSION = '2.0',
+        HEADER_ROW= TRUE
+    ) AS [result]
