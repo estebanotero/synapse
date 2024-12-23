@@ -32,3 +32,25 @@ select  partner_id
 
 from  SB_ENT_UN.du.Dim_player
 GROUP by partner_id
+
+
+
+-- Leo tabla delta en Onelake
+
+SELECT * FROM 
+OPENROWSET(
+    BULK 'https://onelake.dfs.fabric.microsoft.com/NYCTaxi_Dev/Silver_LH_NYCTaxi.Lakehouse/Tables/Silver_NYCTaxi',
+    FORMAT = 'DELTA'
+) AS result
+where YEAR=2017
+
+-- Leo archivos parquet de un Azure blob location
+
+SELECT * FROM 
+OPENROWSET(
+    BULK 'https://esteban02.blob.core.windows.net/contenedor/ServerlessDB/NYCTaxi/Year=*/*.*',
+    FORMAT = 'PARQUET'
+) AS result
+where result.filepath(1)= 2018
+
+--result.filepath(1)= 2018  Uso el filepath(1) para que el solo se lea la partición que necesito
