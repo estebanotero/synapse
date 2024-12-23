@@ -18,3 +18,56 @@ WITH (LOCATION = 'abfss://filesystemdesarrollo@storageaccdesarrollo.dfs.core.win
 
 CREATE EXTERNAL DATA SOURCE [produccion] 
 WITH (LOCATION = 'https://storageaccproduccion.dfs.core.windows.net/bplay')
+
+-- Creo el Squema de tablas que voy a usar
+
+CREATE SCHEMA [dw]
+
+-- Creo el tipo de formato que voy a usar
+
+IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'Parquet') 
+	CREATE EXTERNAL FILE FORMAT [Parquet] 
+	WITH ( FORMAT_TYPE = PARQUET)
+GO
+
+/*
+IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'Delta') 
+	CREATE EXTERNAL FILE FORMAT [Delta] 
+	WITH ( FORMAT_TYPE = DELTA)
+GO
+*/
+
+Drop EXTERNAL FILE FORMAT [DELTA]
+
+-- Mapeo la ruta de los archivos parquete
+
+
+IF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'DP600ADLS') 
+	CREATE EXTERNAL DATA SOURCE [DP600ADLS] 
+	WITH (
+		LOCATION = 'abfss://dp600@synapseeotero.dfs.core.windows.net/DP600ADLS/' 
+	)
+GO
+
+
+IF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'DP600ADLS') 
+	CREATE EXTERNAL DATA SOURCE [DP600ADLS] 
+	WITH (
+		LOCATION = 'abfss://dp600@synapseeotero.dfs.core.windows.net' 
+	)
+GO
+
+
+IF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'ADLSCapacitaciones') 
+	CREATE EXTERNAL DATA SOURCE [ADLSCapacitaciones] 
+	WITH (
+		LOCATION = 'abfss://deltatable@storagecapacitaciones.dfs.core.windows.net' 
+	)
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'CapacitacionesLH') 
+	CREATE EXTERNAL DATA SOURCE [CapacitacionesLH] 
+	WITH (
+		LOCATION = 'abfss://116036f4-f54e-4111-b8da-ab15d521c465@onelake.dfs.fabric.microsoft.com/5482a972-0d25-4f55-8914-003337b8d21e/Tables/' 
+	)
+GO
